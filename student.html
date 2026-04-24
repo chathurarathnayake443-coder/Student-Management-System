@@ -115,6 +115,66 @@
         $('#course_content').css('display', 'block');
         $('#student_content').css('display', 'none');
     })
+
+
+    // student section
+
+    let student_db_array = [];
+
+    const nic_regex = new RegExp("^(([5,6,7,8,9]{1})([0-9]{1})([0,1,2,3,5,6,7,8]{1})([0-9]{6})([v|V|x|X]))|(([1,2]{1})([0,9]{1})([0-9]{2})([0,1,2,3,5,6,7,8]{1})([0-9]{7}))");
+    const phone_regex = new RegExp("^[0]{1}[7]{1}[01245678]{1}[0-9]{7}$");
+
+    // student save
+
+    $('#student_save_btn').on('click', function () {
+
+        let student_id = $('#student_id_input').val();
+        let student_name = $('#student_name_input').val();
+        let student_nic = $('#student_nic_input').val();
+        let student_phone = $('#student_phone_input').val();
+        let student_address = $('#student_address_input').val();
+
+        (student_id == "") ? alert('ID Missing') : !nic_regex.test(student_nic)? alert('Invalid NIC')
+            : (student_name == "") ? alert('Name Missing') : !phone_regex.test(student_phone) ?
+                alert('Invalid Phone Number') : (student_address == "") ? alert('Address Missing') : addToStudents(student_id, student_name, student_nic, student_phone, student_address);
+
+    })
+
+    const addToStudents = (id, name, nic, phone, address) => {
+        let student = {
+            id: id,
+            name: name,
+            nic: nic,
+            phone: phone,
+            address: address,
+        }
+
+        student_db_array.push(student);
+        addToStudentTable();
+    }
+
+    const addToStudentTable = () => {
+        $('#student-tbody').empty();
+
+        student_db_array.map((item, index) => {
+            let data = `${item.id},${item.name},${item.nic},${item.phone},${item.address}`;
+            let newRow = `<tr data-index="${data}"><td>${item.id}</td><td>${item.name}</td><td>${item.nic}</td><td>${item.phone}</td><td>${item.address}</td></tr>`;
+            $('#student_tbody').append(newRow);
+        })
+    }
+
+    // student reset
+
+    $('#student_reset_btn').on('click', function () {
+        $('#student_id_input').val("");
+        $('#student_name_input').val("");
+        $('#student_nic_input').val("");
+        $('#student_phone_input').val("");
+        $('#student_address_input').val("");
+    })
+
+    // load Student Data
+
 </script>
 
 </body>
