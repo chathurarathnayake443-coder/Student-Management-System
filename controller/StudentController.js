@@ -1,3 +1,5 @@
+import {addToStudents,updateStudentData,deleteStudent,getStudentData,getStudentDataByIndex,getStudentDataById} from "../model/StudentModel.js";
+import {check_nic,check_phone} from "../utils/regex_utils.js";
 // student section
 
 // student save
@@ -10,29 +12,17 @@ $('#student_save_btn').on('click', function () {
     let student_phone = $('#student_phone_input').val();
     let student_address = $('#student_address_input').val();
 
-    (student_id == "") ? alert('ID Missing') : !nic_regex.test(student_nic)? alert('Invalid NIC')
-        : (student_name == "") ? alert('Name Missing') : !phone_regex.test(student_phone) ?
-            alert('Invalid Phone Number') : (student_address == "") ? alert('Address Missing') : addToStudents(student_id, student_name, student_nic, student_phone, student_address);
-
+    (student_id == "") ? alert('ID Missing') : !check_nic(student_nic)? alert('Invalid NIC')
+        : (student_name == "") ? alert('Name Missing') : !check_phone(student_phone) ?
+            alert('Invalid Phone Number') : (student_address == "") ? alert('Address Missing') : (addToStudents(student_id, student_name, student_nic, student_phone, student_address),addToStudentTable(),$('#student_reset_btn').trigger('click'));
 })
-
-const addToStudents = (id, name, nic, phone, address) => {
-    let student = {
-        id: id,
-        name: name,
-        nic: nic,
-        phone: phone,
-        address: address,
-    }
-
-    student_db_array.push(student);
-    addToStudentTable();
-}
 
 // load student table
 
 const addToStudentTable = () => {
     $('#student_tbody').empty();
+
+    let student_db_array = getStudentData();
 
     student_db_array.map((item, index) => {
         let data = `${item.id},${item.name},${item.nic},${item.phone},${item.address}`;
@@ -53,7 +43,7 @@ $('#student_reset_btn').on('click', function () {
 
 // load Student Data
 $('#student_tbody').on('click', 'tr' ,function () {
-    let obj = student_db_array[$(this).index()];
+    let obj = getStudentDataByIndex($(this).index());
 
     $('#student_id_input').val(obj.id);
     $('#student_name_input').val(obj.name);
@@ -72,42 +62,15 @@ $('#student_update_btn').on('click', function () {
     let student_phone = $('#student_phone_input').val();
     let student_address = $('#student_address_input').val();
 
-    (student_id == "") ? alert('ID Missing') : !nic_regex.test(student_nic)? alert('Invalid NIC')
-        : (student_name == "") ? alert('Name Missing') : !phone_regex.test(student_phone) ?
-            alert('Invalid Phone Number') : (student_address == "") ? alert('Address Missing') : updateStudentData(student_id, student_name, student_nic, student_phone, student_address);
+    (student_id == "") ? alert('ID Missing') : !check_nic(student_nic)? alert('Invalid NIC')
+        : (student_name == "") ? alert('Name Missing') : !check_phone(student_phone) ?
+            alert('Invalid Phone Number') : (student_address == "") ? alert('Address Missing') : (updateStudentData(student_id, student_name, student_nic, student_phone, student_address),addToStudentTable(), $('#student_reset_btn').trigger('click'));
 
 })
-
-const updateStudentData = (id,name, nic, phone, address) => {
-    let obj = student_db_array.find(item => item.id == id);
-
-    if(obj){
-        obj.id = id;
-        obj.name = name;
-        obj.nic = nic;
-        obj.phone = phone;
-        obj.address = address;
-    }
-    addToStudentTable();
-}
 
 // student delete
 $('#student_delete_btn').on('click', function () {
     let student_id = $('#student_id_input').val();
 
-    (student_id == "")? alert('ID Missing') : (!getStudentByID(student_id)) ? alert('Student Not Found') : deleteStudent(student_id);
+    (student_id == "")? alert('ID Missing') : (!getStudentDataById(student_id)) ? alert('Student Not Found') : (deleteStudent(student_id),addToStudentTable(), $('#student_reset_btn').trigger('click'));
 })
-
-// get student by id
-
-const getStudentByID = (id) => {
-    let stuId = student_db_array.find(item => item.id == id);
-
-    return stuId !== undefined;
-}
-
-const deleteStudent = (id) => {
-    let index = student_db_array.findIndex(item => item.id == id);
-    student_db_array.splice(index, 1);
-    addToStudentTable();
-}

@@ -73,7 +73,6 @@ const updateStudentData = (id,name, nic, phone, address) => {
 const deleteStudent = (id) => {
     let index = student_db_array.findIndex(item => item.id == id);
     student_db_array.splice(index, 1);
-    addToStudentTable();
 }
 
 // ===================== Get Student ===========================
