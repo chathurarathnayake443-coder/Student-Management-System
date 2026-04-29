@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="assets/styles/styles.css">
+</head>
+<body>
+<header>
+    <nav id="navbar" class="navbar navbar-expand-lg bg-primary position-fixed w-100 top-0">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">IJSE</a>
+            <button id="menu_btn" type="button" class="btn btn-info">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+    </nav>
+</header>
+<main>
+    <aside id="sidebar" class="position-fixed bottom-0 margin-auto bg-primary-subtle">
+        <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+            <li class="nav-item m-2">
+                <div class="nav-link" >Dashboard</div>
+            </li>
+            <li class="nav-item m-2 text-primary" id="student_sidebar_tab">
+                <div class="nav-link">Student Management</div>
+            </li>
+            <li class="nav-item m-2" id="course_sidebar_tab">
+                <div class="nav-link">Course Management</div>
+            </li>
+            <li class="nav-item m-2">
+                <div class="nav-link">Registration Management</div>
+            </li>
+        </ul>
+    </aside>
+
+    <section id="course_content" class="content p-5">
+
+        <form class="w-50 m-auto">
+            <h1 class="text-center">Course Management</h1>
+            <div class="mb-3">
+                <label for="course_id_input" class="form-label">ID</label>
+                <input type="number" class="form-control" id="course_id_input">
+            </div>
+            <div class="mb-3">
+                <label for="course_name_input" class="form-label">Name</label>
+                <input type="text" class="form-control" id="course_name_input">
+            </div>
+            <div class="mb-3">
+                <label for="course_credits_input" class="form-label">Credits</label>
+                <input type="number" class="form-control" id="course_credits_input">
+            </div>
+
+            <div class="text-end">
+                <button type="button" id="course_save_btn" class="btn btn-success">Save</button>
+                <button type="button" id="course_update_btn" class="btn btn-primary">Update</button>
+                <button type="button" id="course_delete_btn" class="btn btn-danger">Delete</button>
+                <button type="reset" id="course_reset_btn" class="btn btn-info">Reset</button>
+            </div>
+        </form>
+
+        <table class="table m-5">
+            <thead>
+            <tr>
+                <th scope="col">#ID</th>
+                <th scope="col">Name</th>
+                <th scope="credits">Credits</th>
+            </tr>
+            </thead>
+            <tbody id="course_tbody">
+
+            </tbody>
+        </table>
+
+    </section>
+
+</main>
+
+<script src="../assets/lib/jquery-4.0.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+
+<script>
+    let sidebar_open = true;
+    $('#menu_btn').on('click', function () {
+        if(sidebar_open) {
+            $('#sidebar').css({display: 'none'});
+            $('.content').css({marginLeft: '0px'});
+            sidebar_open = false;
+        } else {
+            $('#sidebar').css({display: 'block'});
+            $('.content').css({marginLeft: '250px'});
+            sidebar_open = true;
+        }
+    })
+
+    $('#course_content').css('display', 'none');
+
+    $('#student_sidebar_tab').on('click', function () {
+        $('#course_content').css('display', 'none');
+        $('#student_content').css('display', 'block');
+    })
+
+    $('#course_sidebar_tab').on('click', function () {
+        $('#course_content').css('display', 'block');
+        $('#student_content').css('display', 'none');
+    })
+
+    // course-db-array
+
+
+    // course save
+    $('#course_save_btn').on('click', function () {
+        let course_id = $('#course_id_input').val();
+        let course_name = $('#course_name_input').val();
+        let course_credits = $('#course_credits_input').val();
+
+        (course_id == "")? alert('ID Missing') : (course_name == "")? alert('Name Missing') : (course_credits == "")? alert('Credit Count Missing') : addToCourse(course_id,course_name,course_credits);
+    })
+
+    const addToCourse = (id,name,credits) => {
+        let course = {
+            id: id,
+            name: name,
+            credits: credits
+        }
+
+        course_db_array.push(course);
+        loadCourseTable();
+        $('#course_reset_btn').trigger('click');
+    }
+
+    const loadCourseTable = () => {
+        $('#course_tbody').empty();
+
+        course_db_array.map((item,index) => {
+            let data = `${item.id},${item.name},${item.credits}`;
+            let newRow = `<tr data-index="${data}"><td>${item.id}</td><td>${item.name}</td><td>${item.credits}</td></tr>`
+            $('#course_tbody').append(newRow);
+        })
+    }
+
+    //load course data
+    $('#course_tbody').on('click', 'tr', function () {
+        let obj = course_db_array[$(this).index()];
+
+        $('#course_id_input').val(obj.id);
+        $('#course_name_input').val(obj.name);
+        $('#course_credits_input').val(obj.credits);
+
+        $(this).css('cursor', 'pointer');
+    })
+
+    // reset course form
+    $('#course_reset_btn').on('click', function () {
+        $('#course_id_input').val("");
+        $('#course_name_input').val("");
+        $('#course_credits_input').val("");
+    })
+
+    // course update
+    $('#course_update_btn').on('click', function () {
+        let course_id = $('#course_id_input').val();
+        let course_name = $('#course_name_input').val();
+        let course_credits = $('#course_credits_input').val();
+
+        (course_id == "")? alert("ID Missing") : (course_name == "")? alert("Name Missing") : (course_credits == "")? alert("Credits Missing") : updateCourse(course_id,course_name,course_credits);
+    })
+
+    const updateCourse = (course_id,course_name,course_credits) => {
+        let obj = course_db_array.find(item=> item.id==course_id)
+
+        if(obj){
+            obj.id=course_id;
+            obj.name=course_name;
+            obj.credits=course_credits;
+        }
+
+        $('#course_reset_btn').trigger('click');
+        loadCourseTable();
+    }
+
+    // delete course
+    $('#course_delete_btn').on('click', function () {
+        let course_id = $('#course_id_input').val();
+
+        (course_id == "")? alert("ID Missing") : (!(getCourseDataById(course_id)))? alert("Course Not Found") : deleteCourse(course_id);
+    })
+
+    const deleteCourse = (course_id) => {
+        let index = course_db_array.findIndex(item=> item.id==course_id)
+
+        course_db_array.splice(index,1);
+        loadCourseTable();
+        $('#course_reset_btn').trigger('click');
+    }
+
+    // get index
+    const getCourseDataById = (id) => {
+        return course_db_array.find(item=>item.id==id);
+    }
+
+</script>
+</body>
+</html>
